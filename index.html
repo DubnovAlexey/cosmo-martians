@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmo Martians</title>
+    <meta name="description" content="A shared black-humour easter egg for Alexey Dubnov's portfolio: cartoon martians whose heads pop to the music.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👽%3C/text%3E%3C/svg%3E">
+    <style>
+        :root { --bg: #0b0d12; --card: #161a22; --text: #e6edf3; --muted: #9aa7b4; --accent: #9fd36b; --pink: #f4a3b8; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: radial-gradient(circle at 70% 10%, #2a1420 0, var(--bg) 55%); color: var(--text);
+            font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; min-height: 100vh; }
+        main { max-width: 760px; margin: 0 auto; padding: 32px 16px 80px; }
+        h1 { font-size: 2rem; margin: 0 0 .25rem; color: var(--accent); }
+        p { color: var(--muted); }
+        .card { background: var(--card); border: 1px solid #262c38; border-radius: 14px; padding: 18px; margin: 18px 0; }
+        .row { display: flex; flex-wrap: wrap; gap: 10px; }
+        button.demo { border: 1px solid #3a4352; background: #1f2530; color: var(--text); padding: 9px 16px; border-radius: 10px;
+            font: inherit; cursor: pointer; }
+        button.demo:hover { border-color: var(--accent); }
+        button.demo.on { background: var(--accent); color: #10200a; border-color: var(--accent); }
+        .friend { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; font-size: 52px;
+            background: #1f2a1a; border: 2px solid #4f7d2c; margin: 8px auto 0; }
+        code { color: var(--pink); }
+        pre { background: #0f1218; border-radius: 10px; padding: 12px; overflow-x: auto; color: var(--text); font-size: .85rem; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Cosmo Martians 👽</h1>
+    <p>A shared easter egg for my portfolio, in the spirit of <em>Mars Attacks!</em> — creepy enough to be funny.
+        Without music the martians peek out of the screen edges. Press <b>Play test music</b>: they dance, chatter,
+        and their heads pop into pink brain splashes. Sometimes the splashes hit the screen from inside.</p>
+
+    <div class="card">
+        <div class="row">
+            <button class="demo" id="music" type="button">▶ Play test music</button>
+            <button class="demo" id="show" type="button">Call a martian</button>
+            <button class="demo" id="eat" type="button">Feed the frog</button>
+            <button class="demo" id="splat" type="button">Splash the screen</button>
+        </div>
+        <p id="stats"></p>
+        <div class="friend" id="friend" title="A friend who eats martians like flies">🐸</div>
+    </div>
+
+    <div class="card">
+        <p>Add to any project with one line:</p>
+        <pre>&lt;script src="https://dubnovalexey.github.io/cosmo-martians/martians.js"
+        data-project="library" data-name="My Library" defer&gt;&lt;/script&gt;</pre>
+        <p>The counter and the 👽 on/off button are shared by all my projects on <code>dubnovalexey.github.io</code>.</p>
+    </div>
+</main>
+
+<script src="martians.js" data-project="cosmo-martians" data-name="Cosmo Martians"
+        data-friend="#friend" data-friend-name="Frog" data-friend-eats="true"></script>
+<script>
+    // Тестовая «музыка» на Web Audio: простая мелодия; о ней сообщаем марсианам событием cosmo:music
+    let ac = null, loop = null;
+    const btn = document.getElementById("music");
+    const notes = [392, 440, 494, 523, 494, 440, 392, 330];
+
+    function beep(freq, at) {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = "triangle";
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(0.08, at + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + 0.25);
+        o.connect(g).connect(ac.destination);
+        o.start(at);
+        o.stop(at + 0.3);
+    }
+
+    btn.addEventListener("click", () => {
+        if (loop) {
+            clearInterval(loop);
+            loop = null;
+            btn.textContent = "▶ Play test music";
+            btn.classList.remove("on");
+            window.dispatchEvent(new CustomEvent("cosmo:music", {detail: {playing: false}}));
+            return;
+        }
+        ac = ac || new AudioContext();
+        let i = 0;
+        loop = setInterval(() => beep(notes[i++ % notes.length], ac.currentTime), 280);
+        btn.textContent = "⏸ Stop music";
+        btn.classList.add("on");
+        window.dispatchEvent(new CustomEvent("cosmo:music", {detail: {playing: true}}));
+    });
+
+    document.getElementById("show").addEventListener("click", () => cosmoMartians.show());
+    document.getElementById("eat").addEventListener("click", () => cosmoMartians.eat());
+    document.getElementById("splat").addEventListener("click", () => cosmoMartians.splat());
+
+    function showStats() {
+        const s = cosmoMartians.stats();
+        const projects = Object.entries(s.projects).map(([k, v]) => `${k}: ${v}`).join(", ");
+        document.getElementById("stats").textContent =
+            `Heads popped: ${s.total}${projects ? " (" + projects + ")" : ""} · eaten by a friend: ${s.eaten || 0}`;
+    }
+
+    showStats();
+    setInterval(showStats, 2000);
+</script>
+</body>
+</html>
