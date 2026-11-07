@@ -21,7 +21,7 @@ Serve this directory with a static HTTP server and open `index.html`. Music begi
 <script src="./martians.js" data-project="my-project" defer></script>
 ```
 
-Configuration attributes: `data-project` (name for the shared counter), `data-rate="normal|rare"` (`rare` for work tools where interruptions matter), `data-friend` (a CSS selector of a page character) and `data-friend-eats="true"`.
+Configuration attributes: `data-project` (name for the shared counter), `data-rate="normal|rare"` (`rare` for work tools where interruptions matter), `data-friend` (a CSS selector of a page character), `data-friend-eats="true"` and `data-music` (a CSS selector of the player that counts as music, for example `#playlistAudio`; without it any playing `<audio>` or `<video>` longer than 8 seconds counts, so pages with background hum or interface sounds should name their music player).
 
 The module notices any `<audio>`, `<video>` or `new Audio()` that plays music. Projects using Web Audio publish their music state explicitly:
 

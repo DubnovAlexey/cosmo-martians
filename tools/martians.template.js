@@ -18,6 +18,9 @@
 //   data-rate         "normal" (по умолчанию) или "rare" — для рабочих программ, где важно не мешать
 //   data-friend       CSS-селектор «друга» на странице (например ".zoich")
 //   data-friend-eats  "true" — друг иногда ловит марсианина языком и глотает, как муху
+//   data-music        CSS-селектор плеера, который считается музыкой (например "#playlistAudio");
+//                     без него музыкой считается любой звучащий <audio>/<video> длиннее 8 секунд —
+//                     а с ним фоновый гул или звуки интерфейса страницы марсиан не взрывают
 // Проекты со звуком Web Audio сообщают о музыке сами:
 //   window.dispatchEvent(new CustomEvent("cosmo:music", {detail: {playing: true}}))
 // Общая память проектов на одном адресе (localStorage): cosmo-martians:off — выключатель,
@@ -33,7 +36,8 @@
         project: (script && script.dataset.project) || location.pathname.split("/")[1] || "site",
         rate: (script && script.dataset.rate) || "normal",
         friend: script && script.dataset.friend,
-        friendEats: !!(script && script.dataset.friendEats === "true")
+        friendEats: !!(script && script.dataset.friendEats === "true"),
+        music: script && script.dataset.music
     };
     const RATES = {
         normal: {quiet: [9000, 16000], music: [8000, 18000]},
@@ -108,6 +112,10 @@
     let webAudioMusic = false;
 
     function isMusicLike(media) {
+        if (config.music) {
+            // Страница назвала свой музыкальный плеер — остальные звуки (фон, щелчки) музыкой не считаются
+            try { if (!media.matches(config.music)) return false; } catch (e) { return false; }
+        }
         return !media.muted && media.volume > 0 && !(media.duration > 0 && media.duration < 8); // писк — не музыка
     }
 
@@ -211,7 +219,7 @@
         if (musicPlaying()) return;
         const control = document.querySelector("[data-martian-play]");
         if (control) { control.click(); return; }
-        const audio = document.querySelector("audio");
+        const audio = (config.music && document.querySelector(config.music)) || document.querySelector("audio");
         if (audio) audio.play().catch(() => {});
     }
 

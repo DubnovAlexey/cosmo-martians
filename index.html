@@ -16,9 +16,10 @@
         p { color: var(--muted); }
         .card { background: var(--card); border: 1px solid #262c38; border-radius: 14px; padding: 18px; margin: 18px 0; }
         .row { display: flex; flex-wrap: wrap; gap: 10px; }
-        button.demo { border: 1px solid #3a4352; background: #1f2530; color: var(--text); padding: 9px 16px; border-radius: 10px;
+        button.demo, a.demo { border: 1px solid #3a4352; background: #1f2530; color: var(--text); padding: 9px 16px; border-radius: 10px;
             font: inherit; cursor: pointer; }
-        button.demo:hover { border-color: var(--accent); }
+        button.demo:hover, a.demo:hover { border-color: var(--accent); }
+        a.demo { display: inline-block; text-decoration: none; }
         button.demo.on { background: var(--accent); color: #10200a; border-color: var(--accent); }
         .friend { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; font-size: 52px;
             background: #1f2a1a; border: 2px solid #4f7d2c; margin: 8px auto 0; }
@@ -40,6 +41,7 @@
             <button class="demo" id="show" type="button">Call a martian</button>
             <button class="demo" id="eat" type="button">Feed the frog</button>
             <button class="demo" id="splat" type="button">Splash the screen</button>
+            <a class="demo" href="https://github.com/DubnovAlexey/cosmo-martians" target="_blank" rel="noopener noreferrer">Source code</a>
         </div>
         <p id="stats"></p>
         <div class="friend" id="friend" title="A friend who eats martians like flies">🐸</div>
