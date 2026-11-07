@@ -185,10 +185,17 @@
         el.style.transformOrigin = spot.name === "bottom" ? "50% 100%" : "50% 50%";
     }
 
+    const SPOT_WEIGHTS = {bottom: 0.38, top: 0.3, left: 0.16, right: 0.16}; // сверху и снизу — чаще
+    function pickSpot() {
+        let roll = Math.random();
+        for (const spot of SPOTS) { roll -= SPOT_WEIGHTS[spot.name]; if (roll <= 0) return spot; }
+        return SPOTS[0];
+    }
+
     function freeSpot(el) {
-        let spot = pick(SPOTS);
+        let spot = pickSpot();
         for (let attempt = 0; attempt < 10; attempt++) {
-            spot = pick(SPOTS);
+            spot = pickSpot();
             placeMartian(el, spot);
             const x = parseFloat(el.style.left) || 0, y = parseFloat(el.style.top) || 0;
             const close = crowd.some(m => m.spot.name === spot.name &&
@@ -196,6 +203,16 @@
             if (!close) break;
         }
         return spot;
+    }
+
+    // Нажатие на тревогу включает музыку страницы: кнопкой с data-martian-play, если она есть,
+    // иначе первым <audio> на странице
+    function startMusic() {
+        if (musicPlaying()) return;
+        const control = document.querySelector("[data-martian-play]");
+        if (control) { control.click(); return; }
+        const audio = document.querySelector("audio");
+        if (audio) audio.play().catch(() => {});
     }
 
     function updateHint() {
@@ -207,11 +224,13 @@
         if (!hint) {
             hint = document.createElement("div");
             hint.className = "cm-hint";
-            hint.setAttribute("role", "status");
+            hint.setAttribute("role", "alert");
+            hint.innerHTML = '<span class="cm-hint__sign" aria-hidden="true">⚠</span><span class="cm-hint__text"></span>';
+            hint.addEventListener("click", startMusic); // табличку можно нажать — она включает музыку страницы
             document.body.appendChild(hint);
         }
         const lang = (document.documentElement.lang || "en").slice(0, 2);
-        hint.textContent = HINT[lang] || HINT.en;
+        hint.querySelector(".cm-hint__text").textContent = HINT[lang] || HINT.en;
         hint.dir = lang === "he" ? "rtl" : "ltr";
         hint.classList.add("visible");
     }
@@ -318,12 +337,21 @@
         martian.el.classList.add("quiet");
         clearInterval(martian.fidget);
         let peeking = false;
+        // Появился — сразу палит, не дожидаясь музыки
+        setTimeout(() => { if (martian.state === "quiet" && canShow()) volley(martian); }, rand(500, 1200));
         martian.fidget = setInterval(() => {
             if (martian.state !== "quiet") return;
             peeking = !peeking;
             martian.el.style.transform = peeking ? martian.spot.peek : martian.spot.shown;
+            if (!peeking && canShow() && Math.random() < 0.55) setTimeout(() => volley(martian), 600);
         }, rand(3000, 7000));
         updateHint();
+    }
+
+    function volley(martian) {
+        if (!martian.el.isConnected) return;
+        fireBlaster(martian);
+        if (Math.random() < 0.55) setTimeout(() => martian.el.isConnected && fireBlaster(martian), 380);
     }
 
     function doom(martian) {
@@ -361,45 +389,45 @@
         martian.state = "popping";
         const el = martian.el;
         el.classList.add("frenzy");
-        await wait(1100);
+        await wait(250);
+        fireBlaster(martian);                     // пиу!
+        await wait(420);
+        if (Math.random() < 0.6) fireBlaster(martian);
+        await wait(430);
         el.classList.add("swelling");
         await wait(1500);
         const head = el.querySelector(".cm-head").getBoundingClientRect();
         el.classList.add("popped");
-        const {pieces, eye} = explode(head.left + head.width / 2, head.top + head.height * 0.45);
+        const x = head.left + head.width / 2, y = head.top + head.height * 0.45;
+        explode(x, y);
         playSplat(0.8, true);
         count("popped");
-        aftermath(martian, pieces, eye);
+        aftermath(martian, organsFrom(x, y));
     }
 
-    async function aftermath(martian, pieces, eye) {
+    // Тело без головы вылезает целиком, ищет голову, машет, падает и уползает; части на стекле сползают и тают
+    async function aftermath(martian, organs) {
         const el = martian.el;
-        let glass = [];
-        if (Math.random() < 0.38) {
-            await wait(220);
-            glass = screenSplat();
-        }
-        await wait(1000);
-        eye.classList.add("blinking");
+        el.style.transform = martian.spot.out;
+        await wait(700);
         el.classList.add("searching");
         await wait(1800);
         el.classList.remove("searching");
         el.classList.add("waving");
-        const rolled = getComputedStyle(eye).transform;
-        eye.animate([
-            {transform: rolled},
-            {transform: `${rolled} translateX(${rand(-260, 260)}px) rotate(${rand(-720, 720)}deg)`}
-        ], {duration: 1600, easing: "ease-in", fill: "forwards"});
-        await wait(900);
+        await wait(1500);
+        el.classList.remove("waving");
+        el.classList.add("fallen");
+        await wait(1100);
         el.style.transform = martian.spot.hidden;
-        pieces.forEach(piece => piece.classList.add("fading"));
-        await wait(2300);
+        await wait(900);
         el.remove();
         crowd.splice(crowd.indexOf(martian), 1);
-        pieces.forEach(piece => piece.remove());
-        glass.forEach(blob => blob.classList.add("fading"));
+        const rest = organs.done - 6000;
+        if (rest > 0) await wait(rest);
+        await wait(1200);
+        organs.parts.forEach(part => part.classList.add("fading"));
         await wait(1500);
-        glass.forEach(blob => blob.remove());
+        organs.parts.forEach(part => part.remove());
     }
 
     function schedule(range) {

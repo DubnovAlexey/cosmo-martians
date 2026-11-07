@@ -4,8 +4,8 @@ A shared black-humour easter egg for the portfolio projects, in the style of 195
 
 ## Try it in a minute
 
-1. Wait a little without music: martians gather at the screen edges and get in the way. After the fourth one, a small hint suggests turning the music on.
-2. Press **Play test music**: the crowd dances, then their heads burst one by one — helmet shards, blood, brains and an eyeball fly across the page, sometimes hitting the screen from inside. The headless body pats its neck and waves; the eyeball blinks and rolls away.
+1. Wait a little without music: martians gather at the screen edges and get in the way. They fire blaster beams across the screen. After the fourth one, a burgundy-red danger alert pulses in the centre of the screen and asks to turn the music on; pressing the alert turns it on.
+2. Press **Play test music**: the crowd dances, a martian fires a blaster beam or two across the screen, then the heads burst one by one — an eye, teeth, a finger, an ear and pieces of the helmet and suit hit the screen glass with a splash of blood and slowly slide down. The headless body climbs out, pats its neck, waves, falls over and crawls away.
 3. Press **Feed the frog**: the frog catches a martian with its tongue like a fly. **Call a martian** and **Splash the screen** trigger the other parts by hand.
 4. Use the 👽 button in the corner to send every martian away (the choice is remembered for all projects).
 
@@ -41,7 +41,7 @@ node tools/build-martians.mjs
 
 ## Interaction and accessibility
 
-Martians never block clicks. They do not start while a tab is hidden, a modal is open or the visitor is typing, and they never appear when the system asks for reduced motion. The hint is a polite `role="status"` message. Console helpers: `cosmoMartians.show()`, `.eat()`, `.splat()`, `.stats()`, `.count()`.
+Martians never block clicks; only the visible alert can be pressed (it presses the page button marked `data-martian-play`, or plays the first `<audio>`). They do not start while a tab is hidden, a modal is open or the visitor is typing, and they never appear when the system asks for reduced motion. The alert is announced with `role="alert"`. Console helpers: `cosmoMartians.show()`, `.eat()`, `.splat()`, `.stats()`, `.count()`.
 
 ## Integration boundary
 
