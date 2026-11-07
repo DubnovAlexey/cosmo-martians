@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cosmo Martians</title>
-    <meta name="description" content="A shared black-humour easter egg for Alexey Dubnov's portfolio: cartoon martians whose heads pop to the music.">
+    <meta name="description" content="A shared black-humour easter egg for Alexey Dubnov's portfolio: skull-faced martians that gather in silence and burst to the music.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👽%3C/text%3E%3C/svg%3E">
     <style>
         :root { --bg: #0b0d12; --card: #161a22; --text: #e6edf3; --muted: #9aa7b4; --accent: #9fd36b; --pink: #f4a3b8; }
@@ -29,9 +29,10 @@
 <body>
 <main>
     <h1>Cosmo Martians 👽</h1>
-    <p>A shared easter egg for my portfolio, in the spirit of <em>Mars Attacks!</em> — creepy enough to be funny.
-        Without music the martians peek out of the screen edges. Press <b>Play test music</b>: they dance, chatter,
-        and their heads pop into pink brain splashes. Sometimes the splashes hit the screen from inside.</p>
+    <p>A shared easter egg for my portfolio in the style of 1950s pulp science fiction — scary first, funny second.
+        Without music the martians gather at the screen edges and get in the way. Press <b>Play test music</b>:
+        the crowd dances, then their heads burst one by one — helmet shards, blood, brains and an eyeball.
+        Sometimes it all hits the screen from inside. The headless body waves goodbye; the eyeball rolls away.</p>
 
     <div class="card">
         <div class="row">
@@ -47,13 +48,12 @@
     <div class="card">
         <p>Add to any project with one line:</p>
         <pre>&lt;script src="https://dubnovalexey.github.io/cosmo-martians/martians.js"
-        data-project="library" data-name="My Library" defer&gt;&lt;/script&gt;</pre>
+        data-project="library" defer&gt;&lt;/script&gt;</pre>
         <p>The counter and the 👽 on/off button are shared by all my projects on <code>dubnovalexey.github.io</code>.</p>
     </div>
 </main>
 
-<script src="martians.js" data-project="cosmo-martians" data-name="Cosmo Martians"
-        data-friend="#friend" data-friend-name="Frog" data-friend-eats="true"></script>
+<script src="martians.js" data-project="cosmo-martians" data-friend="#friend" data-friend-eats="true"></script>
 <script>
     // Тестовая «музыка» на Web Audio: простая мелодия; о ней сообщаем марсианам событием cosmo:music
     let ac = null, loop = null;
