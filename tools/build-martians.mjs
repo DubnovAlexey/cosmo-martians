@@ -36,7 +36,7 @@ const css = prefix(marsCss)
 if (css.includes('`') || css.includes('${')) throw new Error('CSS cannot be embedded into a template literal');
 
 // The explosion section numbers in the Mars file are 2 (drawing), 4 (explosion/splats), 5 (sound).
-const relabel = (text, from, to) => text.replace(`// BEGIN SECTION ${from} `, `// BEGIN MARS SECTION ${from} `)
+const relabel = (text, from) => text.replace(`// BEGIN SECTION ${from} `, `// BEGIN MARS SECTION ${from} `)
   .replace(`// END SECTION ${from}`, `// END MARS SECTION ${from}`);
 let output = fs.readFileSync(path.join(here, 'martians.template.js'), 'utf8')
   .replace('/*@@MARS_SECTION_2@@*/', relabel(prefix(section(marsJs, 2)), 2))
@@ -46,3 +46,14 @@ let output = fs.readFileSync(path.join(here, 'martians.template.js'), 'utf8')
 if (output.includes('@@')) throw new Error('An unfilled placeholder remains');
 fs.writeFileSync(path.join(root, 'martians.js'), output);
 console.log(`martians.js built: ${output.length} characters`);
+
+// Natural parts (13.11.2026): the realistic cut-out photos of eyes, teeth, brains… live in Mars-project2/js/organs/
+// next to the source script; the shared module looks for them next to itself, so the folder is copied here.
+const organsFrom = path.join(mars, 'js', 'organs');
+if (fs.existsSync(organsFrom)) {
+  const organsTo = path.join(root, 'organs');
+  fs.mkdirSync(organsTo, { recursive: true });
+  const files = fs.readdirSync(organsFrom).filter((file) => file.endsWith('.webp'));
+  for (const file of files) fs.copyFileSync(path.join(organsFrom, file), path.join(organsTo, file));
+  console.log(`organs copied: ${files.length} photos`);
+}

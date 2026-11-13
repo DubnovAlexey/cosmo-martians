@@ -1,3 +1,6 @@
+// noinspection JSUnresolvedReference,JSUnusedLocalSymbols,JSUndeclaredVariable,DuplicatedCode
+// ↑ пометка для IntelliJ на весь файл: в шаблон при сборке вставляются разделы 2, 4 и 5 из Mars-project2 (рисунок,
+//   взрыв, звук) — их функции и константы здесь не видны, а собранный martians.js — копия этого шаблона.
 // cosmo-martians/martians.js — СОБРАН АВТОМАТИЧЕСКИ командой `node tools/build-martians.mjs`, не править вручную.
 // Источник: этот шаблон (tools/martians.template.js) + рисунок, взрыв, кляксы, звук и стили из
 // Mars-project2 (js/martians.js, CSS/martians.css). Там же — основная версия марсиан.
@@ -254,6 +257,8 @@
     function playGulp() {
         try {
             const volume = music().volume * 0.6 || 0.3;
+            // старый Safari знает Web Audio только под именем webkitAudioContext
+            // noinspection JSUnresolvedReference
             audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
             const now = audioCtx.currentTime;
             const oscillator = audioCtx.createOscillator();
@@ -318,7 +323,7 @@
         const friend = visibleFriend();
         if (!friend || !(forceEat || Math.random() < 0.25)) return false;
         forceEat = false;
-        eatMartian(martian, friend);
+        eatMartian(martian, friend).catch(() => {}); // сцена идёт сама, ждать её не нужно
         return true;
     }
     // END SECTION 6
@@ -370,7 +375,7 @@
         martian.el.classList.remove("quiet");
         martian.el.style.transform = martian.spot.shown;
         updateHint();
-        runQueue();
+        runQueue().catch(() => {}); // очередь взрывов живёт сама по себе
     }
 
     async function waitOrSilence(ms) {
@@ -412,7 +417,7 @@
         explode(x, y);
         playSplat(0.8, true);
         count("popped");
-        aftermath(martian, organsFrom(x, y));
+        aftermath(martian, organsFrom(x, y)).catch(() => {}); // развязка идёт сама
     }
 
     // Тело без головы вылезает целиком, ищет голову, машет, падает и уползает; части на стекле сползают и тают
