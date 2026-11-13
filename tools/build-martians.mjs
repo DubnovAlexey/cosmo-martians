@@ -49,11 +49,14 @@ console.log(`martians.js built: ${output.length} characters`);
 
 // Natural parts (13.11.2026): the realistic cut-out photos of eyes, teeth, brains… live in Mars-project2/js/organs/
 // next to the source script; the shared module looks for them next to itself, so the folder is copied here.
+// list.json names the photos that exist, so the script never asks the server for a missing file (no 404 noise).
 const organsFrom = path.join(mars, 'js', 'organs');
-if (fs.existsSync(organsFrom)) {
-  const organsTo = path.join(root, 'organs');
-  fs.mkdirSync(organsTo, { recursive: true });
-  const files = fs.readdirSync(organsFrom).filter((file) => file.endsWith('.webp'));
-  for (const file of files) fs.copyFileSync(path.join(organsFrom, file), path.join(organsTo, file));
-  console.log(`organs copied: ${files.length} photos`);
-}
+const organsTo = path.join(root, 'organs');
+fs.mkdirSync(organsFrom, { recursive: true });
+fs.mkdirSync(organsTo, { recursive: true });
+const files = fs.readdirSync(organsFrom).filter((file) => file.endsWith('.webp'));
+for (const file of files) fs.copyFileSync(path.join(organsFrom, file), path.join(organsTo, file));
+const ready = `${JSON.stringify(files.map((file) => file.replace(/\.webp$/, '')))}\n`;
+fs.writeFileSync(path.join(organsFrom, 'list.json'), ready);
+fs.writeFileSync(path.join(organsTo, 'list.json'), ready);
+console.log(`organs copied: ${files.length} photos (list.json written)`);
